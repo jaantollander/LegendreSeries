@@ -6,7 +6,7 @@ import seaborn
 from matplotlib.animation import FuncAnimation
 
 from legendre_series import legendre_polynomials, step_function_coefficients, \
-    legendre_series
+    legendre_series, v_function_coefficients
 
 dirname = "figures"
 os.makedirs(dirname, exist_ok=True)
@@ -39,73 +39,85 @@ def plot_piecewise_functions(x, a):
     plt.figure()
     plt.xlabel("$x$")
     plt.ylabel("$f(x)$")
-    plt.plot(x, np.abs(x-a), label="$u(x)$")
-    plt.plot(x, np.sign(x-a), label="$u'(x)$")
+    plt.plot(x, v_function(x, a), label="$u(x)$")
+    plt.plot(x, step_function(x, a), label="$u'(x)$")
     plt.legend()
-    plt.savefig(os.path.join(dirname, "piecewise_functions.png"), dpi=300)
+    plt.savefig(os.path.join(dirname, f"piecewise_functions.png"), dpi=300)
     # plt.show()
 
 
-def plot_pointwise_convergence(x, a, n):
-    coefficients = step_function_coefficients(a)
-    series = legendre_series(x, coefficients)
+def plot_pointwise_convergence(x, a, n, coefficients, name, f):
+    series = legendre_series(x, coefficients(a))
+
+    assert isinstance(x, float)
     degs = np.arange(n)
     values = np.array([next(series) for _ in degs])
-    error = np.abs(step_function(x, a) - values)
+    error = np.abs(f(x, a) - values)
+
     plt.figure()
-    plt.xlabel("$n$")
-    plt.ylabel(r"$\varepsilon(x)$")
+    plt.title(f"x={x}, a={a}")
+    plt.xlabel(r"Degree $n$")
+    plt.ylabel(r"Error $\varepsilon(x)$")
     plt.loglog(degs, error)
-    # plt.legend()
-    # plt.savefig(os.path.join(dirname, "pointwise_convergence.png"), dpi=300)
+    plt.savefig(os.path.join(dirname, f"pointwise_convergence_{name}_{x}_{a}.png"), dpi=300)
     plt.show()
 
 
-def animation_legendre_series():
+def animate_legendre_series(x, a, n, coefficients, name, f):
+    series = legendre_series(x, coefficients(a))
+
     # Legendre Series
-    # TODO: beta parameter
-    # TODO: function animation
-    start = -1
-    stop = 1
-    x = np.linspace(start, stop, 1001)
-    a = 0.5
-    n = 100  # frames
+    start = np.min(x)
+    stop = np.max(x)
+    ymin = np.min(f(x, a)) - 0.3
+    ymax = np.max(f(x, a)) + 0.3
 
-    coefficients = step_function_coefficients(a)
-    series = legendre_series(x, coefficients)
-
-    # TODO: title, current degree (n)
     fig, axes = plt.subplots(1, 2, figsize=(12, 6))
     axes[0].set(
         xlim=(start, stop),
-        ylim=(-1.3, 1.3),
+        ylim=(ymin, ymax),
         xlabel="$x$",
         ylabel="$f(x)$",
     )
     axes[1].set(
         xlim=(start, stop),
-        ylim=(1e-6, 1),
+        ylim=(1e-6, 1.1),
         xlabel="$x$",
         ylabel=r"$\varepsilon(x)$",
     )
+    axes[0].set_title(f"n={0}")
+    axes[0].plot(x, f(x, a))
     fig.set_tight_layout(True)
     y = next(series)
     plot_series, = axes[0].plot(x, y)
-    plot_error, = axes[1].semilogy(x, np.abs(np.sign(x - a) - y))
+    error = np.abs(f(x, a) - y)
+    plot_error, = axes[1].semilogy(x, error)
 
     def update(i):
         print(i)
         y = next(series)
+        axes[0].set_title(f"n={i}")
         plot_series.set_data(x, y)
-        plot_error.set_data(x, np.abs(np.sign(x - a) - y))
-        return plot_series
+        error = np.abs(f(x, a) - y)
+        plot_error.set_data(x, error)
+        return plot_series, plot_error
 
-    # FuncAnimation will call the 'update' function for each frame; here
-    # animating over 10 frames, with an interval of 200ms between frames.
+    # TODO: mp4?
     anim = FuncAnimation(fig, update, frames=n, interval=100)
-    anim.save('series.gif', dpi=80, writer='imagemagick')
-    # plt.savefig("one_euro_filter.png", dpi=300)
+    anim.save(os.path.join(dirname, f'{name}.gif'), dpi=80, writer='imagemagick')
     # plt.show()
 
 
-plot_pointwise_convergence(0.49, 0.5, 1e5)
+# TODO: beta parameter
+x = np.linspace(-1, 1, 1001)
+a = 0.5
+n = 200  # frames
+animate_legendre_series(x, a, n,
+                        step_function_coefficients(a),
+                        f"step_function_series_{n}",
+                        step_function)
+
+animate_legendre_series(x, a, n,
+                        v_function_coefficients(a),
+                        f"v_function_series_{n}",
+                        v_function)

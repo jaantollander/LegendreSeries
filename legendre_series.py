@@ -1,6 +1,14 @@
 import numpy as np
 
 
+def step_function(x, a, c=1, beta=0):
+    return c*np.sign(x-a) + beta
+
+
+def v_function(x, a, c=1, alpha=0, beta=0):
+    return c*np.abs(x-a) + alpha + beta*x
+
+
 def legendre_polynomials(x):
     assert isinstance(x, (float, np.ndarray))
     p0 = 1.0 if isinstance(x, float) else np.ones_like(x)
@@ -47,3 +55,7 @@ def legendre_series(x, coefficients):
     while True:
         s += next(p_n) * next(coefficients)
         yield s
+
+
+def pointwise_convergence(x, a, n, f):
+    pass

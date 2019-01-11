@@ -1,6 +1,9 @@
 import numpy as np
 
 
+# TODO: c, alpha and beta parameters
+
+
 def step_function(x, a, c=1, beta=0):
     return c*np.sign(x-a) + beta
 
@@ -48,14 +51,43 @@ def v_function_coefficients(a):
         yield -next(a_n1)/(2*n+3) + next(a_n2)/(2*n-1)
 
 
-def legendre_series(x, coefficients):
+def legendre_series(x, coeff_gen):
     assert isinstance(x, (float, np.ndarray))
     p_n = legendre_polynomials(x)
     s = 0
     while True:
-        s += next(p_n) * next(coefficients)
+        s += next(p_n) * next(coeff_gen)
         yield s
 
 
-def pointwise_convergence(x, a, n, f):
-    pass
+def pointwise_convergence(x, a, n, coeff_func, f):
+    assert isinstance(x, float)
+    assert isinstance(a, float)
+    assert isinstance(n, int) and n > 0
+
+    # TODO: extract out
+    series = legendre_series(x, coeff_func(a))
+    degrees = np.arange(n)
+    values = np.array([next(series) for _ in degrees])
+    errors = np.abs(f(x, a) - values)
+
+    # Logarithmic values
+    d = np.log10(degrees)
+    e = np.log10(errors)
+
+    # Convergence slopes
+    i = 1  # Start from one
+    indices = [i]
+    lines = []
+    while i < len(d)-1:
+        j = np.argmax((e[i + 1:] - e[i]) / (d[i + 1:] - d[i])) + 1 + i
+        slope = (e[j] - e[i]) / (d[j] - d[i])
+        intercept = e[i] - d[i] * slope
+        lines.append((slope, intercept))
+        indices.append(j)
+        i = j
+
+    # FIXME: Choose better convergence line.
+    slope, intercept = lines[2*(len(lines)//3)]
+
+    return degrees, errors, indices, slope, intercept

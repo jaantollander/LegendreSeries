@@ -88,17 +88,19 @@ def plot_pointwise_convergence(x, a, n, coeff_fun, name, f, beta):
     degrees, errors, indices, slope, intercept = pointwise_convergence(
         x, a, n, coeff_fun, f, beta)
 
-    # TODO: ylim (?, 1)
     plt.figure()
+    plt.ylim(1e-8, 1e1)
     plt.title(f"x={x}, a={a}")
     plt.xlabel(r"Degree $n$")
     plt.ylabel(r"Error $\varepsilon(x)$")
     plt.loglog(degrees[1:], errors[1:])
     plt.loglog(degrees[indices], errors[indices])
-    plt.loglog(degrees[1:], (10**intercept)*degrees[1:]**slope)
+    plt.loglog(degrees[1:], (10**intercept)*degrees[1:]**slope,
+               label=f"Slope: {slope:.2f}\nIntercept: {10**intercept:.2f}")
     fpath = os.path.join(dirname, "pointwise_convergence", name)
     os.makedirs(fpath, exist_ok=True)
     # plt.savefig(os.path.join(fpath, f"x{x}_a{a}.png"), dpi=300)
+    plt.legend()
     plt.show()
 
 

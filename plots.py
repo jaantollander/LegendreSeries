@@ -5,8 +5,8 @@ import numpy as np
 import seaborn
 from matplotlib.animation import FuncAnimation
 
-from legendre_series import legendre_polynomials, step_function_coefficients, \
-    legendre_series, step_function, v_function, pointwise_convergence
+from legendre_series import legendre_polynomials, legendre_series, \
+    step_function, v_function, pointwise_convergence
 
 # TODO: move inside functions
 dirname = "figures"
@@ -84,9 +84,9 @@ def animate_legendre_series(x, a, n, coeff_fun, name, f):
     # plt.show()
 
 
-def plot_pointwise_convergence(x, a, n, coeff_fun, name, f):
+def plot_pointwise_convergence(x, a, n, coeff_fun, name, f, beta):
     degrees, errors, indices, slope, intercept = pointwise_convergence(
-        x, a, n, coeff_fun, f)
+        x, a, n, coeff_fun, f, beta)
 
     # TODO: ylim (?, 1)
     plt.figure()
@@ -106,8 +106,5 @@ def plot_slopes_and_intercepts(x, a):
     pass
 
 
-# TODO: function animation of pointwise convergence
-plot_pointwise_convergence(0.499, 0.5, int(1e5),
-                           step_function_coefficients,
-                           "step_function",
-                           step_function)
+def animate_pointwise_convergence():
+    pass

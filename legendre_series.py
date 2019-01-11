@@ -60,7 +60,16 @@ def legendre_series(x, coeff_gen):
         yield s
 
 
-def pointwise_convergence(x, a, n, coeff_func, f):
+def conjecture(x, a, beta):
+    if x == a:
+        return -1 if beta == 0 else -beta
+    elif x == -1 or x == 1:
+        return -(beta + 1/2)
+    else:
+        return -(beta + 1)
+
+
+def pointwise_convergence(x, a, n, coeff_func, f, beta):
     assert isinstance(x, float)
     assert isinstance(a, float)
     assert isinstance(n, int) and n > 0
@@ -77,7 +86,7 @@ def pointwise_convergence(x, a, n, coeff_func, f):
 
     # Convergence slopes
     i = 1  # Start from one
-    indices = [i]
+    indices = [i]  # Candidates
     lines = []
     while i < len(d)-1:
         j = np.argmax((e[i + 1:] - e[i]) / (d[i + 1:] - d[i])) + 1 + i
@@ -87,7 +96,8 @@ def pointwise_convergence(x, a, n, coeff_func, f):
         indices.append(j)
         i = j
 
-    # FIXME: Choose better convergence line.
-    slope, intercept = lines[2*(len(lines)//3)]
+    # Use the conjecture to filter out bad candidates
+    slope, intercept = list(filter(
+        lambda elem: elem[0] > conjecture(x, a, beta), lines))[-1]
 
     return degrees, errors, indices, slope, intercept

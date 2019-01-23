@@ -55,7 +55,7 @@ def animate_legendre_series(x, a, n, coeff_fun, name, f, save=False):
     ymin = np.min(f(x, a)) - 0.3
     ymax = np.max(f(x, a)) + 0.3
 
-    fig, axes = plt.subplots(1, 2, figsize=(12, 6))
+    fig, axes = plt.subplots(1, 2, figsize=(16, 8))
     axes[0].set(
         xlim=(start, stop),
         ylim=(ymin, ymax),
@@ -87,11 +87,9 @@ def animate_legendre_series(x, a, n, coeff_fun, name, f, save=False):
 
     anim = FuncAnimation(fig, update, frames=n, interval=100)
     if save:
-        # TODO: gif and video (mp4, mkv) options
-        # TODO: better dpi
         os.makedirs(dirname, exist_ok=True)
         fpath = os.path.join(dirname, f'{name}.mp4')
-        anim.save(fpath, dpi=80, writer='ffmpeg')
+        anim.save(fpath, dpi=300, writer='ffmpeg')
         # anim.save(os.path.join(dirname, f'{name}.gif'), dpi=80, writer='imagemagick')
     else:
         plt.show()
@@ -125,7 +123,7 @@ def animate_pointwise_convergence():
     pass
 
 
-def plot_intercepts(xs, a, n, coeff_fun, name, f, beta, save=False):
+def plot_intercepts(xs, a, n, coeff_fun, func_name, f, beta, save=False):
     """Create a plot of the behaviour of the intercepts."""
     intercepts = []
     for x in xs:
@@ -140,14 +138,14 @@ def plot_intercepts(xs, a, n, coeff_fun, name, f, beta, save=False):
     plt.plot(xs, intercepts, '.')
 
     if save:
-        fpath = os.path.join(dirname, "intercepts", name)
+        fpath = os.path.join(dirname, "intercepts", func_name)
         os.makedirs(fpath, exist_ok=True)
         plt.savefig(os.path.join(fpath, f"{a}.png"))
     else:
         plt.show()
 
 
-def plot_intercepts_loglog(xs, a, xi, n, coeff_fun, name, f, beta, label, save=False):
+def plot_intercepts_loglog(xs, a, xi, n, coeff_fun, func_name, f, beta, label, name, save=False):
     """Create a plot of the behaviour of the intercepts near the singularity
     and edges."""
     intercepts = []
@@ -166,13 +164,13 @@ def plot_intercepts_loglog(xs, a, xi, n, coeff_fun, name, f, beta, label, save=F
     plt.xlabel(r"$\xi$")
     plt.ylabel(f"$k({label})$")
     plt.loglog(xi, 10 ** np.array(intercepts), '.')
-    # TODO: improve label
-    plt.loglog(xi, 10 ** p(xi_log), label=f"{tuple(z)}")
+    # TODO: improve label, variable names
+    plt.loglog(xi, 10 ** p(xi_log), label=f"{z[0]:.5f}\n{z[1]:.5f}")
     plt.legend()
 
     if save:
-        fpath = os.path.join(dirname, "intercepts_near", name)
+        fpath = os.path.join(dirname, "intercepts_loglog", func_name, str(a))
         os.makedirs(fpath, exist_ok=True)
-        plt.savefig(os.path.join(fpath, f"{a}.png"))
+        plt.savefig(os.path.join(fpath, f"{name}.png"))
     else:
         plt.show()

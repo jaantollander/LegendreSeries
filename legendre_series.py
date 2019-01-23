@@ -5,14 +5,17 @@ import numpy as np
 
 
 def step_function(x, a, c=1, beta=0):
+    """Step function."""
     return c*np.sign(x-a) + beta
 
 
 def v_function(x, a, c=1, alpha=0, beta=0):
+    """V-function."""
     return c*np.abs(x-a) + alpha + beta*x
 
 
 def legendre_polynomials(x):
+    """Generator of Legendre polynomials at x."""
     assert isinstance(x, (float, np.ndarray))
     p0 = 1.0 if isinstance(x, float) else np.ones_like(x)
     p1 = x
@@ -28,6 +31,7 @@ def legendre_polynomials(x):
 
 
 def step_function_coefficients(a):
+    """Generator of step function coefficients for Legendre series at a."""
     assert isinstance(a, float)
     p_a1 = legendre_polynomials(a)
     p_a2 = legendre_polynomials(a)
@@ -39,6 +43,7 @@ def step_function_coefficients(a):
 
 
 def v_function_coefficients(a):
+    """Generator of V-function coefficients for Legendre series at a."""
     assert isinstance(a, float)
     a_n1 = step_function_coefficients(a)
     a_n2 = step_function_coefficients(a)
@@ -52,6 +57,7 @@ def v_function_coefficients(a):
 
 
 def legendre_series(x, coeff_gen):
+    """Generator of Legendre series at x for given coefficient generator."""
     assert isinstance(x, (float, np.ndarray))
     p_n = legendre_polynomials(x)
     s = 0
@@ -61,6 +67,7 @@ def legendre_series(x, coeff_gen):
 
 
 def conjecture(x, a, beta):
+    """Conjecture about the values of slopes of the pointwise convergence."""
     if x == a:
         return -1 if beta == 0 else -beta
     elif x == -1 or x == 1:
@@ -70,11 +77,12 @@ def conjecture(x, a, beta):
 
 
 def pointwise_convergence(x, a, n, coeff_func, f, beta):
+    """Computes the pointwise convergence."""
+    # FIXME: x=0, a=0
     assert isinstance(x, float)
     assert isinstance(a, float)
     assert isinstance(n, int) and n > 0
 
-    # TODO: extract out
     series = legendre_series(x, coeff_func(a))
     degrees = np.arange(n)
     values = np.array([next(series) for _ in degrees])
@@ -97,7 +105,7 @@ def pointwise_convergence(x, a, n, coeff_func, f, beta):
         i = j
 
     # Use the conjecture to filter out bad candidates
-    slope, intercept = list(filter(
-        lambda elem: elem[0] > conjecture(x, a, beta), lines))[-1]
+    l = list(filter(lambda elem: elem[0] > conjecture(x, a, beta), lines))
+    slope, intercept = l[-1]
 
     return degrees, errors, indices, slope, intercept

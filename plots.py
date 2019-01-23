@@ -113,7 +113,7 @@ def plot_pointwise_convergence(x, a, n, coeff_fun, name, f, beta, save=False):
     if save:
         fpath = os.path.join(dirname, "pointwise_convergence", name)
         os.makedirs(fpath, exist_ok=True)
-        plt.savefig(os.path.join(fpath, f"x{x}_a{a}.png"), dpi=300)
+        plt.savefig(os.path.join(fpath, f"a{a}_x{x}.png"), dpi=300)
     else:
         plt.show()
 

@@ -8,15 +8,18 @@ from plots import animate_legendre_series, plot_pointwise_convergence, \
 
 # TODO: a =  0.0, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 0.999
 # x should include a, -1, and 1
-x = np.linspace(-1, 1, 1001)
-a = 0.5
-x = np.union1d(x, [-1, a, 1])
+left_edge = -1.0
+right_edge = 1.0
+x = np.linspace(left_edge, right_edge, 1001)
+a = 0.5  # Singularity
+x = np.union1d(x, [left_edge, a, right_edge])
 n = 10**5
 xi = np.logspace(-4, -2, 25, base=10)
 near_left_a = a - xi
 near_right_a = a + xi
-near_left_edge = -1 + xi
-near_right_edge = 1 - xi
+near_left_edge = left_edge + xi
+near_right_edge = right_edge - xi
+special_points = [-a, a, 0.0, left_edge, right_edge]
 
 # Add the extra points near singularity (a) and edges (-1 and 1).
 x2 = np.union1d(
@@ -43,92 +46,97 @@ frames = 100
 #                         v_function,
 #                         save=True)
 
-# plot_pointwise_convergence(0.499, 0.5, n,
-#                            step_function_coefficients,
-#                            "step_function",
-#                            step_function,
-#                            0)
-#
-# plot_pointwise_convergence(1 - 1e-7, 0.5, n,
-#                            v_function_coefficients,
-#                            "v_function",
-#                            v_function,
-#                            1)
+# for x in special_points:
+#     plot_pointwise_convergence(x, a, n,
+#                                step_function_coefficients,
+#                                "step_function",
+#                                step_function,
+#                                0,
+#                                save=True)
 
+for x in special_points:
+    plot_pointwise_convergence(x, a, n,
+                               v_function_coefficients,
+                               "v_function",
+                               v_function,
+                               1,
+                               save=True)
+
+# TODO: increase figure size
 # plot_intercepts(x2, a, n, step_function_coefficients, "step_function",
 #                 step_function, 0, save=True)
 #
 # plot_intercepts(x2, a, n, v_function_coefficients, "v_function",
 #                 v_function, 1, save=True)
 
-plot_intercepts_loglog(near_left_a, a, xi, n,
-                       step_function_coefficients,
-                       "step_function",
-                       step_function,
-                       0,
-                       label=r"a-\xi",
-                       name="near_left_a",
-                       save=True)
-
-plot_intercepts_loglog(near_right_a, a, xi, n,
-                       step_function_coefficients,
-                       "step_function",
-                       step_function,
-                       0,
-                       label=r"a+\xi",
-                       name="near_right_a",
-                       save=True)
-
-plot_intercepts_loglog(near_left_edge, a, xi, n,
-                       step_function_coefficients,
-                       "step_function",
-                       step_function,
-                       0,
-                       label=r"-1+\xi",
-                       name="near_left_edge",
-                       save=True)
-
-plot_intercepts_loglog(near_right_edge, a, xi, n,
-                       step_function_coefficients,
-                       "step_function",
-                       step_function,
-                       0,
-                       label=r"1+\xi",
-                       name="near_right_edge",
-                       save=True)
-
-plot_intercepts_loglog(near_left_a, a, xi, n,
-                       v_function_coefficients,
-                       "v_function",
-                       v_function,
-                       1,
-                       label=r"a-\xi",
-                       name="near_left_a",
-                       save=True)
-
-plot_intercepts_loglog(near_right_a, a, xi, n,
-                       v_function_coefficients,
-                       "v_function",
-                       v_function,
-                       1,
-                       label=r"a+\xi",
-                       name="near_right_a",
-                       save=True)
-
-plot_intercepts_loglog(near_left_edge, a, xi, n,
-                       v_function_coefficients,
-                       "v_function",
-                       v_function,
-                       1,
-                       label=r"-1+\xi",
-                       name="near_left_edge",
-                       save=True)
-
-plot_intercepts_loglog(near_right_edge, a, xi, n,
-                       v_function_coefficients,
-                       "v_function",
-                       v_function,
-                       1,
-                       label=r"1+\xi",
-                       name="near_right_edge",
-                       save=True)
+# plot_intercepts_loglog(near_left_a, a, xi, n,
+#                        step_function_coefficients,
+#                        "step_function",
+#                        step_function,
+#                        0,
+#                        label=r"a-\xi",
+#                        name="near_left_a",
+#                        save=True)
+#
+# plot_intercepts_loglog(near_right_a, a, xi, n,
+#                        step_function_coefficients,
+#                        "step_function",
+#                        step_function,
+#                        0,
+#                        label=r"a+\xi",
+#                        name="near_right_a",
+#                        save=True)
+#
+# plot_intercepts_loglog(near_left_edge, a, xi, n,
+#                        step_function_coefficients,
+#                        "step_function",
+#                        step_function,
+#                        0,
+#                        label=r"-1+\xi",
+#                        name="near_left_edge",
+#                        save=True)
+#
+# plot_intercepts_loglog(near_right_edge, a, xi, n,
+#                        step_function_coefficients,
+#                        "step_function",
+#                        step_function,
+#                        0,
+#                        label=r"1+\xi",
+#                        name="near_right_edge",
+#                        save=True)
+#
+# plot_intercepts_loglog(near_left_a, a, xi, n,
+#                        v_function_coefficients,
+#                        "v_function",
+#                        v_function,
+#                        1,
+#                        label=r"a-\xi",
+#                        name="near_left_a",
+#                        save=True)
+#
+# plot_intercepts_loglog(near_right_a, a, xi, n,
+#                        v_function_coefficients,
+#                        "v_function",
+#                        v_function,
+#                        1,
+#                        label=r"a+\xi",
+#                        name="near_right_a",
+#                        save=True)
+#
+# plot_intercepts_loglog(near_left_edge, a, xi, n,
+#                        v_function_coefficients,
+#                        "v_function",
+#                        v_function,
+#                        1,
+#                        label=r"-1+\xi",
+#                        name="near_left_edge",
+#                        save=True)
+#
+# plot_intercepts_loglog(near_right_edge, a, xi, n,
+#                        v_function_coefficients,
+#                        "v_function",
+#                        v_function,
+#                        1,
+#                        label=r"1+\xi",
+#                        name="near_right_edge",
+#                        save=True)

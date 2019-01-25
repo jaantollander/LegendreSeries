@@ -93,6 +93,7 @@ def animate_legendre_series(x, a, n, coeff_fun, name, f, save=False):
         # anim.save(os.path.join(dirname, f'{name}.gif'), dpi=80, writer='imagemagick')
     else:
         plt.show()
+    plt.close(fig)
 
 
 def plot_pointwise_convergence(x, a, n, coeff_fun, name, f, beta, save=False):
@@ -100,22 +101,25 @@ def plot_pointwise_convergence(x, a, n, coeff_fun, name, f, beta, save=False):
     degrees, errors, indices, slope, intercept = pointwise_convergence(
         x, a, n, coeff_fun, f, beta)
 
-    plt.figure()
-    plt.ylim(1e-8, 1e1)
-    plt.title(f"x={x}, a={a}")
-    plt.xlabel(r"Degree $n$")
-    plt.ylabel(r"Error $\varepsilon(x)$")
-    plt.loglog(degrees[1:], errors[1:])
-    plt.loglog(degrees[indices], errors[indices])
-    plt.loglog(degrees[1:], (10 ** intercept) * degrees[1:] ** slope,
-               label=f"Slope: {slope:.2f}\nIntercept: {10 ** intercept:.2f}")
-    plt.legend()
+    fig, ax = plt.subplots()
+    ax.set(
+        ylim=(1e-8, 1e1),
+        title=f"x={x}, a={a}",
+        xlabel=r"Degree $n$",
+        ylabel=r"Error $\varepsilon(x)$"
+    )
+    ax.loglog(degrees[1:], errors[1:])
+    ax.loglog(degrees[indices], errors[indices])
+    ax.loglog(degrees[1:], (10 ** intercept) * degrees[1:] ** slope,
+              label=f"Slope: {slope:.2f}\nIntercept: {10 ** intercept:.2f}")
+    ax.legend()
     if save:
-        fpath = os.path.join(dirname, "pointwise_convergence", name)
+        fpath = os.path.join(dirname, "pointwise_convergence", name, str(a))
         os.makedirs(fpath, exist_ok=True)
-        plt.savefig(os.path.join(fpath, f"a{a}_x{x}.png"), dpi=300)
+        plt.savefig(os.path.join(fpath, f"{x:.7f}.png"), dpi=300)
     else:
         plt.show()
+    plt.close(fig)
 
 
 def animate_pointwise_convergence():
@@ -132,7 +136,7 @@ def plot_intercepts(xs, a, n, coeff_fun, func_name, f, beta, save=False):
             x, a, n, coeff_fun, f, beta)
         intercepts.append(intercept)
 
-    plt.figure()
+    fig = plt.figure(figsize=(16, 8))
     plt.xlabel(r"$x$")
     plt.ylabel(r"Slope $k$")
     plt.plot(xs, intercepts, '.')
@@ -143,6 +147,7 @@ def plot_intercepts(xs, a, n, coeff_fun, func_name, f, beta, save=False):
         plt.savefig(os.path.join(fpath, f"{a}.png"))
     else:
         plt.show()
+    plt.close(fig)
 
 
 def plot_intercepts_loglog(xs, a, xi, n, coeff_fun, func_name, f, beta, label, name, save=False):
@@ -160,7 +165,7 @@ def plot_intercepts_loglog(xs, a, xi, n, coeff_fun, func_name, f, beta, label, n
     z = np.polyfit(xi_log, intercepts, 1)
     p = np.poly1d(z)
 
-    plt.figure()
+    fig = plt.figure()
     plt.xlabel(r"$\xi$")
     plt.ylabel(f"$k({label})$")
     plt.loglog(xi, 10 ** np.array(intercepts), '.')
@@ -174,3 +179,4 @@ def plot_intercepts_loglog(xs, a, xi, n, coeff_fun, func_name, f, beta, label, n
         plt.savefig(os.path.join(fpath, f"{name}.png"))
     else:
         plt.show()
+    plt.close(fig)

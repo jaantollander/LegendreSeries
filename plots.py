@@ -6,7 +6,7 @@ import seaborn
 from matplotlib.animation import FuncAnimation
 
 from legendre_series import legendre_polynomials, legendre_series, \
-    step_function, v_function, pointwise_convergence
+    step_function, v_function, conjecture, convergence_line_log
 
 # Improved plot styles.
 seaborn.set()
@@ -45,9 +45,9 @@ def plot_piecewise_functions(x, a, name="piecewise_functions", save=False):
         plt.show()
 
 
-def animate_legendre_series(x, a, n, coeff_fun, name, f, save=False):
+def animate_legendre_series(x, a, n, coeff_func, name, f, save=False):
     """Create animation of the Legendre series."""
-    series = legendre_series(x, coeff_fun(a))
+    series = legendre_series(x, coeff_func(a))
 
     # Legendre Series
     start = np.min(x)
@@ -96,10 +96,15 @@ def animate_legendre_series(x, a, n, coeff_fun, name, f, save=False):
     plt.close(fig)
 
 
-def plot_pointwise_convergence(x, a, n, coeff_fun, name, f, beta, save=False):
+def plot_pointwise_convergence(x, a, n, coeff_func, name, f, b, save=False):
     """Plot poinwise convergence of Legendre series."""
-    degrees, errors, indices, slope, intercept = pointwise_convergence(
-        x, a, n, coeff_fun, f, beta)
+    series = legendre_series(x, coeff_func(a))
+    degrees = np.arange(n)
+    values = np.array([next(series) for _ in degrees])
+    errors = np.abs(f(x, a) - values)
+
+    a_min = conjecture(x, a, b)
+    alpha, beta = convergence_line_log(degrees, errors, a_min)
 
     fig, ax = plt.subplots()
     ax.set(
@@ -109,9 +114,9 @@ def plot_pointwise_convergence(x, a, n, coeff_fun, name, f, beta, save=False):
         ylabel=r"Error $\varepsilon(x)$"
     )
     ax.loglog(degrees[1:], errors[1:])
-    ax.loglog(degrees[indices], errors[indices])
-    ax.loglog(degrees[1:], (10 ** intercept) * degrees[1:] ** slope,
-              label=f"Slope: {slope:.2f}\nIntercept: {10 ** intercept:.2f}")
+    # ax.loglog(degrees[indices], errors[indices])
+    ax.loglog(degrees[1:], beta * degrees[1:] ** alpha,
+              label=f"Slope: {alpha:.2f}\nIntercept: {beta:.2f}")
     ax.legend()
     if save:
         fpath = os.path.join(dirname, "pointwise_convergence", name, str(a))
@@ -127,19 +132,24 @@ def animate_pointwise_convergence():
     pass
 
 
-def plot_intercepts(xs, a, n, coeff_fun, func_name, f, beta, save=False):
+def plot_intercepts(xs, a, n, coeff_func, func_name, f, b, save=False):
     """Create a plot of the behaviour of the intercepts."""
     intercepts = []
     for x in xs:
         print(x)
-        degrees, errors, indices, slope, intercept = pointwise_convergence(
-            x, a, n, coeff_fun, f, beta)
-        intercepts.append(intercept)
+        series = legendre_series(x, coeff_func(a))
+        degrees = np.arange(n)
+        values = np.array([next(series) for _ in degrees])
+        errors = np.abs(f(x, a) - values)
+
+        a_min = conjecture(x, a, b)
+        alpha, beta = convergence_line_log(degrees, errors, a_min)
+        intercepts.append(beta)
 
     fig = plt.figure(figsize=(16, 8))
     plt.xlabel(r"$x$")
     plt.ylabel(r"Slope $k$")
-    plt.plot(xs, intercepts, '.')
+    plt.plot(xs, np.log10(intercepts), '.')
 
     if save:
         fpath = os.path.join(dirname, "intercepts", func_name)
@@ -150,25 +160,30 @@ def plot_intercepts(xs, a, n, coeff_fun, func_name, f, beta, save=False):
     plt.close(fig)
 
 
-def plot_intercepts_loglog(xs, a, xi, n, coeff_fun, func_name, f, beta, label, name, save=False):
+def plot_intercepts_loglog(xs, a, xi, n, coeff_func, func_name, f, b, label, name, save=False):
     """Create a plot of the behaviour of the intercepts near the singularity
     and edges."""
     intercepts = []
     for x in xs:
         print(x)
-        degrees, errors, indices, slope, intercept = pointwise_convergence(
-            x, a, n, coeff_fun, f, beta)
-        intercepts.append(intercept)
+        series = legendre_series(x, coeff_func(a))
+        degrees = np.arange(n)
+        values = np.array([next(series) for _ in degrees])
+        errors = np.abs(f(x, a) - values)
+
+        a_min = conjecture(x, a, b)
+        alpha, beta = convergence_line_log(degrees, errors, a_min)
+        intercepts.append(beta)
 
     # Fit a line
     xi_log = np.log10(xi)
-    z = np.polyfit(xi_log, intercepts, 1)
+    z = np.polyfit(xi_log, np.log10(intercepts), 1)
     p = np.poly1d(z)
 
     fig = plt.figure()
     plt.xlabel(r"$\xi$")
     plt.ylabel(f"$k({label})$")
-    plt.loglog(xi, 10 ** np.array(intercepts), '.')
+    plt.loglog(xi, np.array(intercepts), '.')
     # TODO: improve label, variable names
     plt.loglog(xi, 10 ** p(xi_log), label=f"{z[0]:.5f}\n{z[1]:.5f}")
     plt.legend()

@@ -1,9 +1,6 @@
 import numpy as np
 
 
-# TODO: c, alpha and beta parameters
-
-
 def step_function(x, a, c=1, beta=0):
     """Step function."""
     return c*np.sign(x-a) + beta
@@ -32,6 +29,7 @@ def legendre_polynomials(x):
 
 def step_function_coefficients(a):
     """Generator of step function coefficients for Legendre series at a."""
+    # TODO: add c and beta parameters
     assert isinstance(a, float)
     p_a1 = legendre_polynomials(a)
     p_a2 = legendre_polynomials(a)
@@ -44,6 +42,7 @@ def step_function_coefficients(a):
 
 def v_function_coefficients(a):
     """Generator of V-function coefficients for Legendre series at a."""
+    # TODO: add c, beta and alpha parameters
     assert isinstance(a, float)
     a_n1 = step_function_coefficients(a)
     a_n2 = step_function_coefficients(a)
@@ -76,36 +75,23 @@ def conjecture(x, a, beta):
         return -(beta + 1)
 
 
-def pointwise_convergence(x, a, n, coeff_func, f, beta):
-    """Computes the pointwise convergence."""
-    # FIXME: x=0, a=0
-    assert isinstance(x, float)
-    assert isinstance(a, float)
-    assert isinstance(n, int) and n > 0
-
-    series = legendre_series(x, coeff_func(a))
-    degrees = np.arange(n)
-    values = np.array([next(series) for _ in degrees])
-    errors = np.abs(f(x, a) - values)
-
-    # Logarithmic values
-    d = np.log10(degrees)
-    e = np.log10(errors)
-
-    # Convergence slopes
-    i = 1  # Start from one
-    indices = [i]  # Candidates
-    lines = []
-    while i < len(d)-1:
-        j = np.argmax((e[i + 1:] - e[i]) / (d[i + 1:] - d[i])) + 1 + i
-        slope = (e[j] - e[i]) / (d[j] - d[i])
-        intercept = e[i] - d[i] * slope
-        lines.append((slope, intercept))
-        indices.append(j)
+def convergence_line(x, y, a_min):
+    """Convergence line."""
+    i = 1
+    j = i
+    while i < len(x)-1:
+        k = np.argmax((y[j + 1:] - y[j]) / (x[j + 1:] - x[j])) + 1 + j
+        a = (y[k] - y[j]) / (x[k] - x[j])
+        if a < a_min:
+            break
         i = j
+        j = k
+    a = (y[j] - y[i]) / (x[j] - x[i])
+    b = y[i] - a*x[i]
+    return a, b
 
-    # Use the conjecture to filter out bad candidates
-    l = list(filter(lambda elem: elem[0] > conjecture(x, a, beta), lines))
-    slope, intercept = l[-1]
 
-    return degrees, errors, indices, slope, intercept
+def convergence_line_log(x, y, a_min):
+    """Convergence line in logarithmic scale."""
+    a, b = convergence_line(np.log10(x), np.log10(y), a_min)
+    return a, 10**b

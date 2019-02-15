@@ -9,11 +9,12 @@ from plots import animate_legendre_series, plot_pointwise_convergence, \
 # TODO: a =  0.0, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99, 0.999
 left_edge = -1.0
 right_edge = 1.0
-a = 0.9  # Singularity
+a = 0.99  # Singularity
 x = np.linspace(left_edge, right_edge, 201)
 special_points = [-a, a, 0.0, left_edge, right_edge]
 x = np.union1d(x, special_points)
-n = 10**5
+n = 10 ** 5
+# TODO: dependent on a, different xi for near a and near edges
 xi = np.logspace(-4, -2, 25, base=10)
 near_left_a = a - xi
 near_right_a = a + xi
@@ -27,37 +28,39 @@ x2 = np.union1d(
 )
 x2 = np.union1d(x, x2)
 
+
 # plot_legendre_polynomials(np.linspace(-1, 1, 1001))
 # plot_piecewise_functions(np.linspace(-1, 1, 1001), 0.5)
 
-frames = 500
-animate_legendre_series(x2, a, 500,
-                        step_function_coefficients,
-                        f"step_function_series_{frames}",
-                        step_function,
-                        save=True)
 
-animate_legendre_series(x2, a, frames,
-                        v_function_coefficients,
-                        f"v_function_series_{frames}",
-                        v_function,
-                        save=True)
-
-for x in x2:
-    print(x)
-    plot_pointwise_convergence(x, 0.6, n, step_function_coefficients,
-                               "step_function", step_function, 0, save=True)
-
-for x in x2:
-    print(x)
-    plot_pointwise_convergence(x, a, n, v_function_coefficients,
-                               "v_function", v_function, 1, save=True)
+# frames = 500
+# animate_legendre_series(x2, a, 500,
+#                         step_function_coefficients,
+#                         f"step_function_series_{frames}",
+#                         step_function,
+#                         save=True)
+#
+# animate_legendre_series(x2, a, frames,
+#                         v_function_coefficients,
+#                         f"v_function_series_{frames}",
+#                         v_function,
+#                         save=True)
+#
+# for x in x2:
+#     print(x)
+#     plot_pointwise_convergence(x, a, n, step_function_coefficients,
+#                                "step_function", step_function, 0, save=True)
+#
+# for x in x2:
+#     print(x)
+#     plot_pointwise_convergence(x, a, n, v_function_coefficients,
+#                                "v_function", v_function, 1, save=True)
 
 plot_intercepts(x2, a, n, step_function_coefficients, "step_function",
-                step_function, 0, save=True)
+                step_function, 0, save=False)
 
 plot_intercepts(x2, a, n, v_function_coefficients, "v_function",
-                v_function, 1, save=True)
+                v_function, 1, save=False)
 
 # plot_intercepts_loglog(near_left_a, a, xi, n,
 #                        step_function_coefficients,

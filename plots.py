@@ -6,7 +6,7 @@ import seaborn
 from matplotlib.animation import FuncAnimation
 
 from legendre_series import legendre_polynomials, legendre_series, \
-    step_function, v_function, conjecture, convergence_line_log
+    step_function, v_function, convergence_rate, convergence_line_log
 
 # Improved plot styles.
 seaborn.set()
@@ -103,7 +103,7 @@ def plot_pointwise_convergence(x, a, n, coeff_func, name, f, b, save=False):
     values = np.array([next(series) for _ in degrees])
     errors = np.abs(f(x, a) - values)
 
-    a_min = conjecture(x, a, b)
+    a_min = -convergence_rate(x, a, b)
     alpha, beta = convergence_line_log(degrees, errors, a_min)
 
     fig, ax = plt.subplots()
@@ -142,7 +142,7 @@ def plot_intercepts(xs, a, n, coeff_func, func_name, f, b, save=False):
         values = np.array([next(series) for _ in degrees])
         errors = np.abs(f(x, a) - values)
 
-        a_min = conjecture(x, a, b)
+        a_min = -convergence_rate(x, a, b)
         alpha, beta = convergence_line_log(degrees, errors, a_min)
         intercepts.append(beta)
 
@@ -171,7 +171,7 @@ def plot_intercepts_loglog(xs, a, xi, n, coeff_func, func_name, f, b, label, nam
         values = np.array([next(series) for _ in degrees])
         errors = np.abs(f(x, a) - values)
 
-        a_min = conjecture(x, a, b)
+        a_min = -convergence_rate(x, a, b)
         alpha, beta = convergence_line_log(degrees, errors, a_min)
         intercepts.append(beta)
 

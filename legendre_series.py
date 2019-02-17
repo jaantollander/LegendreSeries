@@ -65,14 +65,14 @@ def legendre_series(x, coeff_gen):
         yield s
 
 
-def conjecture(x, a, beta):
-    """Conjecture about the values of slopes of the pointwise convergence."""
+def convergence_rate(x, a, b):
+    """Conjecture about the value of the convergence rate."""
     if x == a:
-        return -1 if beta == 0 else -beta
+        return max(b, 1)
     elif x == -1 or x == 1:
-        return -(beta + 1/2)
+        return b + 1 / 2
     else:
-        return -(beta + 1)
+        return b + 1
 
 
 def convergence_line(x, y, a_min):

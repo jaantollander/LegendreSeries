@@ -75,11 +75,12 @@ def convergence_rate(x, a, b):
         return b + 1
 
 
-def convergence_line(x, y, a_min):
+def convergence_line(x, y, a_min=-np.inf):
     """Convergence line."""
+    assert len(x) == len(y) > 1
     i = 1
     j = i
-    while i < len(x)-1:
+    while j < len(x)-1:
         k = np.argmax((y[j + 1:] - y[j]) / (x[j + 1:] - x[j])) + 1 + j
         a = (y[k] - y[j]) / (x[k] - x[j])
         if a < a_min:

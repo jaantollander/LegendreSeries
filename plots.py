@@ -11,6 +11,8 @@ from legendre_series import legendre_polynomials, legendre_series, \
 # Improved plot styles.
 seaborn.set()
 
+# TODO: plot_legendre_series
+
 
 def plot_legendre_polynomials(x, n=5, name="legendre_polynomials", save=False,
                               dirname="figures"):
@@ -45,8 +47,8 @@ def plot_piecewise_functions(x, a, name="piecewise_functions", save=False,
         plt.show()
 
 
-def animate_legendre_series(x, a, n, coeff_func, name, f, save=False,
-                            dirname="figures"):
+def plot_legendre_series(x, a, n, coeff_func, name, f, ylim_min,
+                         save=False, dirname="figures"):
     """Create animation of the Legendre series."""
     series = legendre_series(x, coeff_func(a))
 
@@ -65,7 +67,52 @@ def animate_legendre_series(x, a, n, coeff_func, name, f, save=False,
     )
     axes[1].set(
         xlim=(start, stop),
-        ylim=(1e-6, 1.1),
+        ylim=(ylim_min, 1.1),
+        xlabel="$x$",
+        ylabel=r"$|\varepsilon_k(x)|$",
+    )
+    axes[0].set_title(f"k={n}")
+    axes[1].set_title(f"k={n}")
+    axes[0].plot(x, f(x, a))
+    fig.set_tight_layout(True)
+
+    for _ in range(n):
+        next(series)
+
+    y = next(series)
+    plot_series, = axes[0].plot(x, y)
+    error = np.abs(f(x, a) - y)
+    plot_error, = axes[1].semilogy(x, error)
+
+    if save:
+        os.makedirs(dirname, exist_ok=True)
+        plt.savefig(os.path.join(dirname, f"legendre_series.png"), dpi=300)
+    else:
+        plt.show()
+    plt.close(fig)
+
+
+def animate_legendre_series(x, a, n, coeff_func, name, f, ylim_min,
+                            save=False, dirname="figures"):
+    """Create animation of the Legendre series."""
+    series = legendre_series(x, coeff_func(a))
+
+    # Legendre Series
+    start = np.min(x)
+    stop = np.max(x)
+    ymin = np.min(f(x, a)) - 0.3
+    ymax = np.max(f(x, a)) + 0.3
+
+    fig, axes = plt.subplots(1, 2, figsize=(16, 8))
+    axes[0].set(
+        xlim=(start, stop),
+        ylim=(ymin, ymax),
+        xlabel="$x$",
+        ylabel="$f_k(x)$",
+    )
+    axes[1].set(
+        xlim=(start, stop),
+        ylim=(ylim_min, 1.1),
         xlabel="$x$",
         ylabel=r"$|\varepsilon_k(x)|$",
     )

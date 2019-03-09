@@ -8,14 +8,14 @@ from matplotlib.animation import FuncAnimation
 from legendre_series import legendre_polynomials, legendre_series, \
     step_function, v_function, convergence_rate, convergence_line_log
 
+DEFAULT_DIR = os.path.join(os.path.dirname(__file__), "figures")
+
 # Improved plot styles.
 seaborn.set()
 
-# TODO: plot_legendre_series
-
 
 def plot_legendre_polynomials(x, n=5, name="legendre_polynomials", save=False,
-                              dirname="figures"):
+                              dirname=DEFAULT_DIR):
     """Plot Legendre polynomials."""
     plt.figure()
     plt.xlabel("$x$")
@@ -32,7 +32,7 @@ def plot_legendre_polynomials(x, n=5, name="legendre_polynomials", save=False,
 
 
 def plot_piecewise_functions(x, a, name="piecewise_functions", save=False,
-                             dirname="figures"):
+                             dirname=DEFAULT_DIR):
     """Plot Step and V-function."""
     plt.figure()
     plt.xlabel("$x$")
@@ -48,7 +48,7 @@ def plot_piecewise_functions(x, a, name="piecewise_functions", save=False,
 
 
 def plot_legendre_series(x, a, n, coeff_func, name, f, ylim_min,
-                         save=False, dirname="figures"):
+                         save=False, dirname=DEFAULT_DIR):
     """Create animation of the Legendre series."""
     series = legendre_series(x, coeff_func(a))
 
@@ -93,7 +93,7 @@ def plot_legendre_series(x, a, n, coeff_func, name, f, ylim_min,
 
 
 def animate_legendre_series(x, a, n, coeff_func, name, f, ylim_min,
-                            save=False, dirname="figures"):
+                            save=False, dirname=DEFAULT_DIR):
     """Create animation of the Legendre series."""
     series = legendre_series(x, coeff_func(a))
 
@@ -148,7 +148,7 @@ def animate_legendre_series(x, a, n, coeff_func, name, f, ylim_min,
 
 
 def plot_pointwise_convergence(x, a, n, coeff_func, name, f, b, ylim_min,
-                               save=False, dirname="figures"):
+                               save=False, dirname=DEFAULT_DIR):
     """Plot poinwise convergence of Legendre series."""
     series = legendre_series(x, coeff_func(a))
     degrees = np.arange(n)
@@ -179,13 +179,13 @@ def plot_pointwise_convergence(x, a, n, coeff_func, name, f, b, ylim_min,
     plt.close(fig)
 
 
-def animate_pointwise_convergence(dirname="figures"):
+def animate_pointwise_convergence(dirname=DEFAULT_DIR):
     """Create an animation of pointwise convergences."""
     pass
 
 
 def plot_convergence_distance(xs, a, n, coeff_func, func_name, f, b, save=False,
-                              dirname="figures"):
+                              dirname=DEFAULT_DIR):
     """Create a plot of the behaviour of the intercepts."""
     betas = []
     for x in xs:
@@ -202,7 +202,7 @@ def plot_convergence_distance(xs, a, n, coeff_func, func_name, f, b, save=False,
     fig = plt.figure(figsize=(16, 8))
     plt.xlabel(r"$x$")
     plt.ylabel(r"$\beta(x)$")
-    plt.plot(xs, np.log10(betas), '.')
+    plt.semilogy(xs, betas, '.', basey=10)
 
     if save:
         fpath = os.path.join(dirname, "convergence_distances", func_name)
@@ -214,7 +214,7 @@ def plot_convergence_distance(xs, a, n, coeff_func, func_name, f, b, save=False,
 
 
 def plot_convergence_distance_loglog(xs, a, xi, n, coeff_func, func_name, f, b,
-                                     label, name, save=False, dirname="figures"):
+                                     label, name, save=False, dirname=DEFAULT_DIR):
     """Create a plot of the behaviour of the intercepts near the singularity
     and edges."""
     betas = []

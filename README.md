@@ -1,5 +1,5 @@
 # Legendre Series for Piecewise Analytic Functions
-This repository is related to my article [*Exploring the Pointwise Convergence of Legendre Series for Piecewise Analytic Functions*](https://jaantollander.com/post/legendre-series/).
+This repository is related to my article [*Exploring the Pointwise Convergence of Legendre Series for Piecewise Analytic Functions*](https://jaantollander.com/post/exploring-the-pointwise-convergence-of-legendre-series-for-piecewise-analytic-functions/).
 
 ## Contents
 - `legendre_series.py` contains the code for computing the Legendre series and analysing the pointwise convergence.
